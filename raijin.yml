@@ -5,6 +5,8 @@
     - soft_dir: /g/data/xe2/opt/new/software
     - modules_dir: /g/data/xe2/opt/new/modules
     - clean_source: false
+    - host_build_script: >
+      export NCI_GXX_ABI_WARNING=1
     - global_dev_modules:
       - gcc/5.2.0
       - python/2.7.11

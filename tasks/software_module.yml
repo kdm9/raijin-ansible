@@ -24,7 +24,7 @@
 - name: Build and Install {{name}}
   shell: >
     export PREFIX="{{soft_dir }}/{{name}}-{{version}}/" &&
-    export NCI_GXX_ABI_WARNING=1 &&
+    {{host_build_script}} &&
     {% for m in global_dev_modules | default([]) %}
     module load {{m}} &&
     {% endfor %}
