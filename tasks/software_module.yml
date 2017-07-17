@@ -1,0 +1,76 @@
+- name: Make directories
+  file:
+    dest: "{{item}}"
+    state: directory
+    mode: 0775
+  with_items:
+    - "{{modules_dir}}/{{name}}"
+    - "{{soft_dir}}/{{name}}-{{version}}"
+    - "{{source_dir}}/{{name}}-{{version}}"
+
+- name: Download {{name}}
+  get_url:
+    url: "{{url}}"
+    dest: "{{source_dir}}/{{name}}-{{version}}/{{url|basename}}"
+
+- name: Uncompress {{name}}
+  unarchive:
+    src: "{{source_dir}}/{{name}}-{{version}}/{{url|basename}}"
+    dest: "{{source_dir}}"
+    copy: no
+    creates: "{{source_dir}}/{{name}}-{{version}}/{{unpack_creates|default('LICENSE')}}"
+  when: "{{url.endswith('.tar.gz') or url.endswith('.zip')}}"
+
+- name: Build and Install {{name}}
+  shell: >
+    export PREFIX="{{soft_dir }}/{{name}}-{{version}}/" &&
+    export NCI_GXX_ABI_WARNING=1 &&
+    {% for m in global_dev_modules | default([]) %}
+    module load {{m}} &&
+    {% endfor %}
+    {% for m in required_modules | default([]) %}
+    module load {{m}} &&
+    {% endfor %}
+    cd {{source_dir}}/{{name}}-{{version}} &&
+    {{build_script}}
+  args:
+    creates: "{{soft_dir }}/{{name}}-{{version}}/{{build_creates|default('bin/' + name)}}"
+  when: build_script is defined
+
+
+
+- name: Module definition for {{name}}
+  template:
+    src: templates/module.j2
+    dest: "{{ modules_dir }}/{{name}}/{{version}}"
+    mode: 0664
+  with_items:
+    - "{{module_def}}"
+
+- name: Module definition for {{name}} -- versionfile
+  template:
+    src: templates/versionfile.j2
+    mode: 0664
+    dest: "{{ modules_dir }}/{{name}}/.version"
+
+- name: Make dir for Java wrapper script for {{name}}
+  file:
+    dest: "{{ soft_dir }}/{{name}}-{{version}}/bin/"
+    state: directory
+    mode: 0775
+  when: java_wrapper is defined
+
+- name: Java wrapper script for {{name}}
+  template:
+    src: templates/java-wrapper.sh.j2
+    dest: "{{ soft_dir }}/{{name}}-{{version}}/bin/{{name}}"
+    mode: 0775
+  with_items:
+    - "{{java_wrapper}}"
+  when: java_wrapper is defined
+
+- name: Remove source dir
+  file:
+    state: absent
+    path: "{{source_dir}}/{{name}}-{{version}}"
+  when: clean_source is defined and clean_source

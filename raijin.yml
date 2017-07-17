@@ -1,0 +1,131 @@
+- hosts: all
+
+  vars:
+    - source_dir: /g/data/xe2/opt/new/source
+    - soft_dir: /g/data/xe2/opt/new/software
+    - modules_dir: /g/data/xe2/opt/new/modules
+    - clean_source: false
+    - global_dev_modules:
+      - gcc/6.2.0
+      - python/2.7.11
+      - intel-cc/17.0.0.098
+      - intel-fc/17.0.0.098
+      - intel-ipp/17.0.0.098
+      - intel-mkl/17.0.0.098
+      - intel-tbb/17.0.0.098
+      - cmake
+
+  tasks:
+    - name: "Create directories"
+      file:
+        dest: "{{item}}"
+        state: directory
+        mode: 0775
+      with_items:
+        - "{{source_dir}}"
+        - "{{soft_dir}}"
+        - "{{modules_dir}}"
+
+    ####################
+    #  AdapterRemoval  #
+    ####################
+    - include: tasks/software_module.yml
+      vars:
+        name: adapterremoval
+        version: "2.2.1a"
+        url: "https://github.com/MikkelSchubert/adapterremoval/archive/v{{version}}.tar.gz"
+        required_modules:
+          - "zlib/1.2.8"
+          - "bzip2/1.0.6"
+        unpack_creates: Makefile
+        build_script: >
+          export CC=gcc &&
+          export CXX=g++ &&
+          make &&
+          make install PREFIX="{{ soft_dir }}/{{name}}-{{version}}"
+        build_creates: bin/AdapterRemoval
+        module_def:
+          help_text: 'rapid adapter trimming, identification, and read merging'
+          dev: false
+      tags: modules,adapterremoval
+
+    #########
+    #  Axe  #
+    #########
+    - include: tasks/software_module.yml
+      vars:
+        name: axe
+        version: "0.3.2"
+        url: "https://github.com/kdmurray91/axe/archive/{{version}}.tar.gz"
+        required_modules:
+          - "zlib/1.2.8"
+        unpack_creates: CMakeLists.txt
+        build_script: >
+          mkdir build && cd build &&
+          cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DZLIB_ROOT=$ZLIB_ROOT .. &&
+          make &&
+          make install 
+        build_creates: bin/axe-demux
+        module_def:
+          help_text: 'rapid demultiplexer'
+          dev: false
+      tags: modules,axe
+
+
+    ############
+    #  Beagle  #
+    ############
+    - include: tasks/software_module.yml
+      vars:
+        name: beagle
+        version: "4.1-08Jun17"
+        url: http://faculty.washington.edu/browning/beagle/beagle.08Jun17.d8b.jar
+        required_modules:
+          - "java/jdk1.8.0_60"
+        build_script: >
+          cp {{source_dir}}/{{name}}-{{version}}/beagle*.jar "$PREFIX/{{build_creates}}"
+        build_creates: "beagle.jar"
+        module_def:
+          help_text: 'Genotype calling and  imputation'
+          dev: false
+        java_wrapper:
+          jar: "{{soft_dir}}/{{name}}-{{version}}/{{build_creates}}"
+          mem: "31g"
+      tags: modules,beagle
+
+    #########
+    #  BWA  #
+    #########
+    - include: tasks/software_module.yml
+      vars:
+        name: bwa
+        version: "0.7.15"
+        url: "https://github.com/lh3/bwa/archive/v{{version}}.tar.gz"
+        required_modules:
+          - "zlib/1.2.8"
+        unpack_creates: Makefile
+        build_script: >
+          make &&
+          mkdir -p "$PREFIX/bin" "$PREFIX/share/man/man1" &&
+          cp bwa "$PREFIX/bin/" &&
+          cp bwa.1 "$PREFIX/share/man/man1/"
+        build_creates: bin/bwa
+        module_def:
+          help_text: 'the Burrows-wheeler short read aligner'
+          dev: false
+      tags: modules,bwa
+
+
+#    - include: software_modules/gridss.yml version=1.4.1
+#      tags: modules,gridss
+#
+#    - include: software_modules/bowtie2.yml version=2.2.9
+#      tags: modules,bowtie2
+#    - include: software_modules/bowtie.yml version=1.1.2
+#      tags: modules,bowtie
+#    - include: software_modules/vcftools.yml version=master
+#      tags: modules,vcftools
+#    - include: software_modules/bedtools.yml version=2.26.0
+#      tags: modules,bedtools
+#    - include: software_modules/kraken.yml version=0.10.5-beta
+#      tags: modules,kraken

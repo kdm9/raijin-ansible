@@ -1,0 +1,4 @@
+#!/bin/bash
+
+exec java -Xmx{{item.mem | default("8g")}} -jar "{{item.jar}}" $@
+
