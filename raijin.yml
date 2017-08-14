@@ -10,11 +10,11 @@
     - global_dev_modules:
       - gcc/5.2.0
       - python/2.7.11
-      - intel-cc/17.0.0.098
-      - intel-fc/17.0.0.098
-      - intel-ipp/17.0.0.098
-      - intel-mkl/17.0.0.098
-      - intel-tbb/17.0.0.098
+      - intel-cc/17.0.1.132
+      - intel-fc/17.0.1.132
+      - intel-ipp/17.0.1.132
+      - intel-mkl/17.0.1.132
+      - intel-tbb/17.0.1.132
       - cmake/3.8.2
 
   tasks:
