@@ -16,15 +16,16 @@
 - name: Uncompress {{name}}
   unarchive:
     src: "{{source_dir}}/{{name}}-{{version}}/{{url|basename}}"
-    dest: "{{source_dir}}"
-    copy: no
-    creates: "{{source_dir}}/{{name}}-{{version}}/{{unpack_creates|default('LICENSE')}}"
-  when: "{{url.endswith('.tar.gz') or url.endswith('.zip')}}"
+    dest: "{{unarchive_dest|default(source_dir)}}"
+    extra_opts: "{{unarchive_extra_opts|default([])}}"
+    remote_src: yes
+    creates: "{{source_dir}}/{{name}}-{{version}}/{{unarchive_creates|default('LICENSE')}}"
+  when: "{{'.tar' in url[-8:] or url.endswith('.zip')}}"
 
 - name: Build and Install {{name}}
   shell: >
     export PREFIX="{{soft_dir }}/{{name}}-{{version}}/" &&
-    {{host_build_script}} &&
+    {{host_build_script.strip()}} &&
     {% for m in global_dev_modules | default([]) %}
     module load {{m}} &&
     {% endfor %}
