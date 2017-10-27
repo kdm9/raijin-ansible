@@ -184,3 +184,27 @@
           help_text: 'the pindel SV caller'
           dev: false
       tags: modules,pindel
+
+
+    ###############
+    #  Structure  #
+    ###############
+    - include: tasks/software_module.yml
+      vars:
+        name: structure
+        version: "2.3.4"
+        url: "https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v{{version}}/structure_kernel_source.tar.gz"
+        required_modules:
+          - "zlib/1.2.8"
+        unarchive_creates: Makefile
+        unarchive_dest: "{{source_dir}}/{{name}}-{{version}}/"
+        unarchive_extra_opts: "--strip-components=1"
+        build_script: >
+          make &&
+          mkdir -p $PREFIX/bin &&
+          cp structure $PREFIX/bin/
+        build_creates: bin/structure
+        module_def:
+          help_text: 'Prichards structure'
+          dev: false
+      tags: modules,structure
