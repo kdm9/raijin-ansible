@@ -42,7 +42,7 @@
 
 - name: Module definition for {{name}}
   template:
-    src: templates/module.j2
+    src: "{{module_template}}"
     dest: "{{ modules_dir }}/{{name}}/{{version}}"
     mode: 0664
   with_items:
@@ -50,7 +50,7 @@
 
 - name: Module definition for {{name}} -- versionfile
   template:
-    src: templates/versionfile.j2
+    src: versionfile.j2
     mode: 0664
     dest: "{{ modules_dir }}/{{name}}/.version"
 
@@ -63,7 +63,7 @@
 
 - name: Java wrapper script for {{name}}
   template:
-    src: templates/java-wrapper.sh.j2
+    src: java-wrapper.sh.j2
     dest: "{{ soft_dir }}/{{name}}-{{version}}/bin/{{name}}"
     mode: 0775
   with_items:

@@ -1,0 +1,191 @@
+- name: "Create directories"
+  file:
+    dest: "{{item}}"
+    state: directory
+    mode: 0775
+  with_items:
+    - "{{source_dir}}"
+    - "{{soft_dir}}"
+    - "{{modules_dir}}"
+
+###############
+#  ARMADILLO  #
+###############
+- include: software_module.yml
+  vars:
+    name: armadillo
+    version: "7.960.1"
+    url: "http://sourceforge.net/projects/arma/files/armadillo-{{version}}.tar.xz"
+    required_modules:
+      - superlu/5.2.1
+    unarchive_creates: CMakeLists.txt
+    build_script: >
+      cmake -DCMAKE_INSTALL_PREFIX=$PREFIX . &&
+      make all &&
+      make  install
+    build_creates: include/armadillo
+    module_def:
+      help_text: 'the armadillo c++ linear algebra libraries'
+      dev: true
+  tags: modules,armadillo,deps
+
+###########
+#  BOOST  #
+###########
+- include: software_module.yml
+  vars:
+    name: boost
+    version: "1.64.0"
+    url: "https://dl.bintray.com/boostorg/release/{{version}}/source/boost_{{version.replace('.', '_')}}.tar.gz"
+    required_modules:
+      - "zlib/1.2.8"
+      - "bzip2/1.0.6"
+    unarchive_creates: boost-build.jam
+    unarchive_dest: "{{source_dir}}/{{name}}-{{version}}/"
+    unarchive_extra_opts: "--strip-components=1"
+    build_script: >
+      ./bootstrap.sh --prefix="$PREFIX" --with-toolset=intel-linux &&
+      ./b2 cxxflags='-std=c++14' install
+    build_creates: include/boost/array.hpp
+    module_def:
+      help_text: 'the boost c++ libraries, with C++14 support'
+      dev: true
+  tags: modules,boost,deps
+
+####################
+#  AdapterRemoval  #
+####################
+- include: software_module.yml
+  vars:
+    name: adapterremoval
+    version: "2.2.2"
+    url: "https://github.com/MikkelSchubert/adapterremoval/archive/v{{version}}.tar.gz"
+    required_modules:
+      - "zlib/1.2.8"
+      - "bzip2/1.0.6"
+    unarchive_creates: Makefile
+    build_script: >
+      export CC=gcc &&
+      export CXX=g++ &&
+      make &&
+      make install PREFIX="{{ soft_dir }}/{{name}}-{{version}}"
+    build_creates: bin/AdapterRemoval
+    module_def:
+      help_text: 'rapid adapter trimming, identification, and read merging'
+      dev: false
+  tags: modules,adapterremoval
+
+#########
+#  Axe  #
+#########
+- include: software_module.yml
+  vars:
+    name: axe
+    version: "0.3.2"
+    url: "https://github.com/kdmurray91/axe/archive/{{version}}.tar.gz"
+    required_modules:
+      - "zlib/1.2.8"
+    unarchive_creates: CMakeLists.txt
+    build_script: >
+      rm -rf build && mkdir build && cd build &&
+      cmake -DCMAKE_INSTALL_PREFIX=$PREFIX -DZLIB_ROOT=$ZLIB_ROOT .. &&
+      make &&
+      make test &&
+      make install 
+    build_creates: bin/axe-demux
+    module_def:
+      help_text: 'rapid demultiplexer'
+      dev: false
+  tags: modules,axe
+
+
+############
+#  Beagle  #
+############
+- include: software_module.yml
+  vars:
+    name: beagle
+    version: "4.1-08Jun17"
+    url: http://faculty.washington.edu/browning/beagle/beagle.08Jun17.d8b.jar
+    required_modules:
+      - "java/jdk1.8.0_60"
+    build_script: >
+      cp {{source_dir}}/{{name}}-{{version}}/beagle*.jar "$PREFIX/{{build_creates}}"
+    build_creates: "beagle.jar"
+    module_def:
+      help_text: 'Genotype calling and  imputation'
+      dev: false
+    java_wrapper:
+      jar: "{{soft_dir}}/{{name}}-{{version}}/{{build_creates}}"
+      mem: "31g"
+  tags: modules,beagle
+
+#########
+#  BWA  #
+#########
+- include: software_module.yml
+  vars:
+    name: bwa
+    version: "0.7.15"
+    url: "https://github.com/lh3/bwa/archive/v{{version}}.tar.gz"
+    required_modules:
+      - "zlib/1.2.8"
+    unarchive_creates: Makefile
+    build_script: >
+      make &&
+      mkdir -p "$PREFIX/bin" "$PREFIX/share/man/man1" &&
+      cp bwa "$PREFIX/bin/" &&
+      cp bwa.1 "$PREFIX/share/man/man1/"
+    build_creates: bin/bwa
+    module_def:
+      help_text: 'the Burrows-wheeler short read aligner'
+      dev: false
+  tags: modules,bwa
+
+############
+#  Pindel  #
+############
+- include: software_module.yml
+  vars:
+    name: pindel
+    version: "0.2.5b8"
+    url: "https://github.com/genome/pindel/archive/v{{version}}.tar.gz"
+    required_modules:
+      - "htslib/1.4"
+      - "zlib/1.2.8"
+    unarchive_creates: INSTALL
+    build_script: >
+      curl https://patch-diff.githubusercontent.com/raw/genome/pindel/pull/59.patch | patch -p1 &&
+      bash ./INSTALL $HTSLIB_ROOT &&
+      mkdir -p $PREFIX/bin &&
+      cp pindel pindel2vcf sam2pindel pindel2vcf4tcga $PREFIX/bin/
+    build_creates: bin/pindel
+    module_def:
+      help_text: 'the pindel SV caller'
+      dev: false
+  tags: modules,pindel
+
+
+###############
+#  Structure  #
+###############
+- include: software_module.yml
+  vars:
+    name: structure
+    version: "2.3.4"
+    url: "https://web.stanford.edu/group/pritchardlab/structure_software/release_versions/v{{version}}/structure_kernel_source.tar.gz"
+    required_modules:
+      - "zlib/1.2.8"
+    unarchive_creates: Makefile
+    unarchive_dest: "{{source_dir}}/{{name}}-{{version}}/"
+    unarchive_extra_opts: "--strip-components=1"
+    build_script: >
+      make &&
+      mkdir -p $PREFIX/bin &&
+      cp structure $PREFIX/bin/
+    build_creates: bin/structure
+    module_def:
+      help_text: 'Prichards structure'
+      dev: false
+  tags: modules,structure
+
