@@ -16,11 +16,11 @@
 - name: Uncompress {{name}}
   unarchive:
     src: "{{source_dir}}/{{name}}-{{version}}/{{url|basename}}"
-    dest: "{{unarchive_dest|default(source_dir)}}"
-    extra_opts: "{{unarchive_extra_opts|default([])}}"
+    dest: "{{unarchive_dest|default('%s/%s-%s' % (source_dir, name, version))}}"
+    extra_opts: "{{unarchive_extra_opts|default(['--strip-components=1'])}}"
     remote_src: yes
     creates: "{{source_dir}}/{{name}}-{{version}}/{{unarchive_creates|default('LICENSE')}}"
-  when: "{{'.tar' in url[-8:] or url.endswith('.zip')}}"
+  when: "{{'.tar' in url[-8:] or url.endswith('.zip') or url.endswith('tgz')}}"
 
 - name: Build and Install {{name}}
   shell: >

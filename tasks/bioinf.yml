@@ -42,7 +42,6 @@
       - "bzip2/1.0.6"
     unarchive_creates: boost-build.jam
     unarchive_dest: "{{source_dir}}/{{name}}-{{version}}/"
-    unarchive_extra_opts: "--strip-components=1"
     build_script: >
       ./bootstrap.sh --prefix="$PREFIX" --with-toolset=intel-linux &&
       ./b2 cxxflags='-std=c++14' install
@@ -142,6 +141,29 @@
       dev: false
   tags: modules,bwa
 
+#########
+#  NGM  #
+#########
+- include: software_module.yml
+  vars:
+    name: nextgenmap
+    version: "0.5.5"
+    url: "https://github.com/cibiv/nextgenmap/archive/v{{version}}.tar.gz"
+    required_modules:
+      - "zlib/1.2.8"
+    unarchive_creates: Makefile
+    build_script: >
+      rm -rf build && mkdir build && cd build &&
+      cmake .. -DCMAKE_INSTALL_PREFIX=.. &&
+      make install &&
+      mkdir -p "$PREFIX/bin" &&
+      cp -r ../bin/ngm-*/* "$PREFIX/bin/"
+    build_creates: bin/ngm
+    module_def:
+      help_text: 'NextGenMap -- short read mapper'
+      dev: false
+  tags: modules,ngm,nextgenmap
+
 ############
 #  Pindel  #
 ############
@@ -178,7 +200,6 @@
       - "zlib/1.2.8"
     unarchive_creates: Makefile
     unarchive_dest: "{{source_dir}}/{{name}}-{{version}}/"
-    unarchive_extra_opts: "--strip-components=1"
     build_script: >
       make &&
       mkdir -p $PREFIX/bin &&
