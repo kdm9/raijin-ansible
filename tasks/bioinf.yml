@@ -199,7 +199,6 @@
     required_modules:
       - "zlib/1.2.8"
     unarchive_creates: Makefile
-    unarchive_dest: "{{source_dir}}/{{name}}-{{version}}/"
     build_script: >
       make &&
       mkdir -p $PREFIX/bin &&
@@ -210,3 +209,24 @@
       dev: false
   tags: modules,structure
 
+
+###############
+# GATK 4 beta #
+###############
+- include: software_module.yml
+  vars:
+    name: gatk4
+    version: "4.beta.6"
+    url: https://github.com/broadinstitute/gatk/releases/download/{{version}}/gatk-{{version}}.zip
+    required_modules:
+      - java/jdk1.8.0_60
+    unarchive_creates: Makefile
+    build_script: >
+      cd gatk-4*/ &&
+      mv gatk-package-*-local.jar gatk-launch $PREFIX/
+    build_creates: gatk-launch
+    path_dir: '.'
+    module_def:
+      help_text: 'GATK4 beta release'
+      dev: false
+  tags: modules,gatk4

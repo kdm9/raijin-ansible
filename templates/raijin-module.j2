@@ -15,7 +15,7 @@ soft-prereq {{e}}
 {% endfor %}
 
 {% if item.bin | default(True) %}
-prepend-path PATH               $PREFIX/bin
+prepend-path PATH               $PREFIX/{{item.path_dir|default("bin")}}
 {% endif %}
 
 {% if item.man | default(True) %}

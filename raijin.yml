@@ -1,11 +1,11 @@
-- hosts: all
+- hosts: raijin.nci.org.au
 
   vars:
     - source_dir: /g/data/xe2/opt/new/source
     - soft_dir: /g/data/xe2/opt/new/software
     - modules_dir: /g/data/xe2/opt/new/modules
     - module_template: "raijin-module.j2"
-    - clean_source: false
+    - clean_source: true
     - host_build_script: >
         export NCI_GXX_ABI_WARNING=1
     - global_dev_modules:

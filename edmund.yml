@@ -1,0 +1,13 @@
+- hosts: edmund.anu.edu.au
+
+  vars:
+    - source_dir: /opt/new/source
+    - soft_dir: /opt/new/software
+    - modules_dir: /opt/new/modules
+    - module_template: luamod-module.j2
+    - clean_source: false
+    - host_build_script: ""
+    - global_dev_modules: []
+
+  tasks:
+    - import_tasks: tasks/bioinf.yml

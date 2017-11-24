@@ -1,0 +1,26 @@
+help(
+[[
+{{ item.help_text }}
+]])
+
+local prefix = "{{soft_dir + '/' + (item.prefix | default(name + '-' + version))}}"
+
+{% for e in required_modules | default([]) %}
+prereq("{{e}}")
+{% endfor %}
+
+
+{% if item.bin | default(True) %}
+prepend_path("PATH", pathJoin(prefix, "{{item.path_dir|default('bin')}}")
+prepend_path("MANPATH", pathJoin(prefix, "share/man"))
+{% endif %}
+
+{% if item.dev | default(False) %}
+prepend_path("CPATH", pathJoin(prefix, "include"))
+prepend_path("C_INCLUDE_PATH", pathJoin(prefix, "include"))
+prepend_path("CPLUS_INCLUDE_PATH", pathJoin(prefix, "include"))
+prepend_path("LIBRARY_PATH", pathJoin(prefix, "lib"))
+prepend_path("LD_LIBRARY_PATH", pathJoin(prefix, "lib"))
+prepend_path("LD_RUN_PATH", pathJoin(prefix, "lib"))
+prepend_path("PKG_CONFIG_PATH", pathJoin(prefix, "lib/pkgconfig"))
+{% endif %}
