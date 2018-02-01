@@ -74,7 +74,7 @@
 - name: Java wrapper script for {{name}}
   template:
     src: java-wrapper.sh.j2
-    dest: "{{ soft_dir }}/{{name}}-{{version}}/bin/{{name}}"
+    dest: "{{ soft_dir }}/{{name}}-{{version}}/bin/{{item.wrapper_name|default(name)}}"
     mode: 0775
   with_items:
     - "{{java_wrapper}}"

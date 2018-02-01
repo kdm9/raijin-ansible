@@ -1,4 +1,4 @@
 #!/bin/bash
 
-exec java -Xmx{{item.mem | default("8g")}} -jar "{{item.jar}}" $@
+exec java -Xmx{{item.mem | default("8g")}} -jar $(readlink -f $(dirname $0))/../"{{item.jar}}" $@
 

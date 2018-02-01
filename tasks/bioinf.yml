@@ -216,16 +216,18 @@
 - include: software_module.yml
   vars:
     name: gatk4
-    version: "4.beta.6"
+    version: "4.0.1.0"
     url: https://github.com/broadinstitute/gatk/releases/download/{{version}}/gatk-{{version}}.zip
     required_modules:
       - java/jdk1.8.0_60
     unarchive_creates: Makefile
+    java_wrapper:
+      wrapper_name: "gatk"
+      jar: gatk-package-{{version}}-local.jar
     build_script: >
       cd gatk-4*/ &&
-      mv gatk-package-*-local.jar gatk-launch $PREFIX/
-    build_creates: gatk-launch
-    path_dir: '.'
+      mv gatk-package-{{version}}-local.jar  $PREFIX/
+    build_creates: gatk-package-{{version}}-local.jar
     module_def:
       help_text: 'GATK4 beta release'
       dev: false
