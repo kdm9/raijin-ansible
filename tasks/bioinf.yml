@@ -104,8 +104,8 @@
 - include: software_module.yml
   vars:
     name: beagle
-    version: "4.1-08Jun17"
-    url: http://faculty.washington.edu/browning/beagle/beagle.08Jun17.d8b.jar
+    version: "4.1-27Jan18"
+    url: https://faculty.washington.edu/browning/beagle/beagle.27Jan18.7e1.jar
     required_modules:
       - "java/jdk1.8.0_60"
     build_script: >
@@ -117,6 +117,7 @@
     java_wrapper:
       jar: "{{soft_dir}}/{{name}}-{{version}}/{{build_creates}}"
       mem: "31g"
+      stack: "50m"
   tags: modules,beagle
 
 #########
