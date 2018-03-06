@@ -1,0 +1,45 @@
+- name: "Create directories"
+  file:
+    dest: "{{item}}"
+    state: directory
+    mode: 0775
+  with_items:
+    - "{{source_dir}}"
+    - "{{soft_dir}}"
+    - "{{modules_dir}}"
+
+##########
+# fdupes #
+##########
+- include: software_module.yml
+  vars:
+    name: fdupes
+    version: 1.6.1
+    url: https://github.com/adrianlopezroche/fdupes/archive/v{{version}}.tar.gz
+    unarchive_creates: Makefile
+    build_script: >
+      mkdir -p $PREFIX/bin && make fdupes && cp fdupes $PREFIX/bin/
+    build_creates: bin/fdupes
+    module_def:
+      help_text: 'Fdupes, duplicate file detector'
+      dev: false
+  tags: modules,fdupes
+
+#######
+# xsv #
+#######
+- include: software_module.yml
+  vars:
+    name: xsv
+    version: 0.12.2
+    url: https://github.com/BurntSushi/xsv/releases/download/{{version}}/xsv-{{version}}-x86_64-unknown-linux-musl.tar.gz
+    unarchive_creates: xsv
+    unarchive_extra_opts: ''
+    build_script: >
+      mkdir -p $PREFIX/bin && cp xsv $PREFIX/bin/
+    build_creates: bin/xsv
+    module_def:
+      help_text: 'xsv: delimited file toolkit'
+      dev: false
+  tags: modules,xsv
+
