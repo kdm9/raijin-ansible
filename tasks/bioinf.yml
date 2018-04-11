@@ -253,3 +253,47 @@
       help_text: 'pbgzip'
       dev: false
   tags: modules,pbgzip
+
+##########
+# seqhax #
+##########
+- include: software_module.yml
+  vars:
+    name: seqhax
+    version: 0.6.0
+    url: https://github.com/kdmurray91/seqhax/archive/{{version}}.tar.gz
+    required_modules:
+      - zlib/1.2.8
+      - cmake
+    unarchive_creates: CMakeLists.txt
+    build_script: >
+      rm -rf build && mkdir build && cd build &&
+      cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX -DZLIB_ROOT=${ZLIB_ROOT} && make install
+    build_creates: bin/seqhax
+    module_def:
+      help_text: 'seqhax: small sequence utilities'
+      dev: false
+  tags: modules,seqhax
+
+##################
+#  fastq-screen  #
+##################
+- include: software_module.yml
+  vars:
+    name: fastq-screen
+    version: 0.11.4
+    url: https://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/fastq_screen_v{{version}}.tar.gz
+    required_modules:
+      - zlib/1.2.8
+      - perl
+      - bowtie2
+      - bwa
+    unarchive_creates: license.txt
+    build_script: >
+      cp * $PREFIX
+    build_creates: fastq-screen
+    module_def:
+      help_text: 'fastq-screen: screen reads by alignment'
+      dev: false
+      path_dir: ''
+  tags: modules,fastq-screen
