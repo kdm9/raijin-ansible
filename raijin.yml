@@ -19,5 +19,6 @@
       - cmake/3.8.2
 
   tasks:
+    - import_tasks: tasks/libraries.yml
     - import_tasks: tasks/utils.yml
     - import_tasks: tasks/bioinf.yml

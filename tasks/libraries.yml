@@ -1,0 +1,91 @@
+- name: "Create directories"
+  file:
+    dest: "{{item}}"
+    state: directory
+    mode: 0775
+  with_items:
+    - "{{source_dir}}"
+    - "{{soft_dir}}"
+    - "{{modules_dir}}"
+
+###############
+#  ARMADILLO  #
+###############
+- include: software_module.yml
+  vars:
+    name: armadillo
+    version: "7.960.1"
+    url: "http://sourceforge.net/projects/arma/files/armadillo-{{version}}.tar.xz"
+    required_modules:
+      - superlu/5.2.1
+    unarchive_creates: CMakeLists.txt
+    build_script: >
+      cmake -DCMAKE_INSTALL_PREFIX=$PREFIX . &&
+      make all &&
+      make  install
+    build_creates: include/armadillo
+    module_def:
+      help_text: 'the armadillo c++ linear algebra libraries'
+      dev: true
+  tags: modules,armadillo,deps
+
+###########
+#  BOOST  #
+###########
+- include: software_module.yml
+  vars:
+    name: boost
+    version: "1.64.0"
+    url: "https://dl.bintray.com/boostorg/release/{{version}}/source/boost_{{version.replace('.', '_')}}.tar.gz"
+    required_modules:
+      - "zlib/1.2.8"
+      - "bzip2/1.0.6"
+    unarchive_creates: boost-build.jam
+    unarchive_dest: "{{source_dir}}/{{name}}-{{version}}/"
+    build_script: >
+      ./bootstrap.sh --prefix="$PREFIX" --with-toolset=intel-linux &&
+      ./b2 cxxflags='-std=c++14' install
+    build_creates: include/boost/array.hpp
+    module_def:
+      help_text: 'the boost c++ libraries, with C++14 support'
+      dev: true
+  tags: modules,boost,deps
+
+
+###########
+#  cunit  #
+###########
+- include: software_module.yml
+  vars:
+    name: cunit
+    version: "2.1-3"
+    url: "https://github.com/kdmurray91/raijin-modules/files/1940950/CUnit-{{version}}.tar.gz"
+    unarchive_creates: configure.in
+    build_script: >
+      autoreconf -i &&
+      ./configure --prefix=$PREFIX &&
+      make &&
+      make install
+    build_creates: include/CUnit/Basic.h
+    module_def:
+      help_text: "Cunit: testing suite for C"
+      dev: true
+  tags: modules,cunit,deps
+
+
+##############
+#  openblas  #
+##############
+- include: software_module.yml
+  vars:
+    name: openblas
+    version: "0.2.20"
+    url: "https://github.com/xianyi/OpenBLAS/archive/v{{version}}.tar.gz"
+    unarchive_creates: Makefile
+    build_script: >
+      make && make -f Makefile.install PREFIX=$PREFIX install
+    build_creates: include/openblas_config.h
+    module_def:
+      help_text: "openblas"
+      dev: true
+  tags: modules,openblas,deps

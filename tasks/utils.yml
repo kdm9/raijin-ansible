@@ -43,3 +43,23 @@
       dev: false
   tags: modules,xsv
 
+
+##########
+# pbgzip #
+##########
+- include: software_module.yml
+  vars:
+    name: pbgzip
+    version: master
+    url: https://github.com/nh13/pbgzip/archive/{{version}}.tar.gz
+    required_modules:
+      - zlib/1.2.8
+    unarchive_creates: autogen.sh
+    build_script: >
+      sh autogen.sh && ./configure --prefix=$PREFIX && make install
+    build_creates: bin/pbgzip
+    module_def:
+      help_text: 'pbgzip'
+      dev: false
+  tags: modules,pbgzip
+

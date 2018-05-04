@@ -1,56 +1,3 @@
-- name: "Create directories"
-  file:
-    dest: "{{item}}"
-    state: directory
-    mode: 0775
-  with_items:
-    - "{{source_dir}}"
-    - "{{soft_dir}}"
-    - "{{modules_dir}}"
-
-###############
-#  ARMADILLO  #
-###############
-- include: software_module.yml
-  vars:
-    name: armadillo
-    version: "7.960.1"
-    url: "http://sourceforge.net/projects/arma/files/armadillo-{{version}}.tar.xz"
-    required_modules:
-      - superlu/5.2.1
-    unarchive_creates: CMakeLists.txt
-    build_script: >
-      cmake -DCMAKE_INSTALL_PREFIX=$PREFIX . &&
-      make all &&
-      make  install
-    build_creates: include/armadillo
-    module_def:
-      help_text: 'the armadillo c++ linear algebra libraries'
-      dev: true
-  tags: modules,armadillo,deps
-
-###########
-#  BOOST  #
-###########
-- include: software_module.yml
-  vars:
-    name: boost
-    version: "1.64.0"
-    url: "https://dl.bintray.com/boostorg/release/{{version}}/source/boost_{{version.replace('.', '_')}}.tar.gz"
-    required_modules:
-      - "zlib/1.2.8"
-      - "bzip2/1.0.6"
-    unarchive_creates: boost-build.jam
-    unarchive_dest: "{{source_dir}}/{{name}}-{{version}}/"
-    build_script: >
-      ./bootstrap.sh --prefix="$PREFIX" --with-toolset=intel-linux &&
-      ./b2 cxxflags='-std=c++14' install
-    build_creates: include/boost/array.hpp
-    module_def:
-      help_text: 'the boost c++ libraries, with C++14 support'
-      dev: true
-  tags: modules,boost,deps
-
 ####################
 #  AdapterRemoval  #
 ####################
@@ -126,7 +73,7 @@
 - include: software_module.yml
   vars:
     name: bwa
-    version: "0.7.15"
+    version: "0.7.17"
     url: "https://github.com/lh3/bwa/archive/v{{version}}.tar.gz"
     required_modules:
       - "zlib/1.2.8"
@@ -234,33 +181,13 @@
       dev: false
   tags: modules,gatk4
 
-
-##########
-# pbgzip #
-##########
-- include: software_module.yml
-  vars:
-    name: pbgzip
-    version: master
-    url: https://github.com/nh13/pbgzip/archive/{{version}}.tar.gz
-    required_modules:
-      - zlib/1.2.8
-    unarchive_creates: autogen.sh
-    build_script: >
-      sh autogen.sh && ./configure --prefix=$PREFIX && make install
-    build_creates: bin/pbgzip
-    module_def:
-      help_text: 'pbgzip'
-      dev: false
-  tags: modules,pbgzip
-
 ##########
 # seqhax #
 ##########
 - include: software_module.yml
   vars:
     name: seqhax
-    version: 0.6.0
+    version: 0.6.2
     url: https://github.com/kdmurray91/seqhax/archive/{{version}}.tar.gz
     required_modules:
       - zlib/1.2.8
@@ -297,3 +224,25 @@
       dev: false
       path_dir: ''
   tags: modules,fastq-screen
+
+################################
+#  scrappie minion basecaller  #
+################################
+- include: software_module.yml
+  vars:
+    name: scrappie
+    version: 1.3.2
+    url: https://github.com/nanoporetech/scrappie/archive/release-{{version}}.tar.gz
+    required_modules:
+      - cunit/2.1-3
+      - hdf5/1.8.10p
+      - openblas/0.2.20
+    unarchive_creates: CMakeLists.txt
+    build_script: >
+      rm -rf build && mkdir build && cd build &&
+      cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX && make install
+    build_creates: bin/scrappie
+    module_def:
+      help_text: 'scappie: a ONT basecaller'
+      dev: false
+  tags: modules,scrappie
