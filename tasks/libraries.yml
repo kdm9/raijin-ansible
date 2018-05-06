@@ -71,21 +71,3 @@
       help_text: "Cunit: testing suite for C"
       dev: true
   tags: modules,cunit,deps
-
-
-##############
-#  openblas  #
-##############
-- include: software_module.yml
-  vars:
-    name: openblas
-    version: "0.2.20"
-    url: "https://github.com/xianyi/OpenBLAS/archive/v{{version}}.tar.gz"
-    unarchive_creates: Makefile
-    build_script: >
-      make && make -f Makefile.install PREFIX=$PREFIX install
-    build_creates: include/openblas_config.h
-    module_def:
-      help_text: "openblas"
-      dev: true
-  tags: modules,openblas,deps

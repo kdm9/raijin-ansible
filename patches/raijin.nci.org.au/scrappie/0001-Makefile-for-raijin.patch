@@ -1,0 +1,94 @@
+From c393a56c5f42dd0301184c29d7ece0fa9b94aa52 Mon Sep 17 00:00:00 2001
+From: Kevin Murray <kdmfoss@gmail.com>
+Date: Sat, 5 May 2018 08:33:28 +1000
+Subject: [PATCH] Makefile for raijin
+
+---
+ Makefile              | 44 +++++++++++++++++++++++++++----------------
+ src/layers.c          |  2 ++
+ src/scrappie_matrix.c |  2 ++
+ 3 files changed, 32 insertions(+), 16 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 79f63c8..678c107 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,23 +1,35 @@
+-buildDir ?= build
+-releaseType ?= Release
++LIB_SRC := src/decode.c src/event_detection.c src/layers.c src/networks.c src/nnfeatures.c src/scrappie_common.c src/scrappie_matrix.c src/scrappie_seq_helpers.c src/util.c
++SCRAPPIE_SRC := src/scrappie.c src/scrappie_raw.c src/scrappie_events.c src/scrappie_mappy.c src/scrappie_squiggle.c src/scrappie_subcommands.c src/scrappie_help.c src/fast5_interface.c
+ 
+-.PHONY: all
+-all: ${buildDir}/scrappie
++CFLAGS += -Wall -Wno-unused-function -fstack-protector-all -fgnu89-inline -O3 -march=native -std=c99 -fopenmp
++CPPFLAGS += -Isrc -DUSE_SSE2 -D__USE_MISC -D_POSIX_SOURCE -DNDEBUG
+ 
+-${buildDir}:
+-	mkdir ${buildDir}
++CFLAGS += $(shell pkg-config --cflags hdf5)
++LDFLAGS += $(shell pkg-config --libs-only-L hdf5) -lhdf5 -fopenmp
++
++BLAS ?= openblas
++ifeq ($(BLAS),mkl)
++	CFLAGS += -DSCRAPPIE_MKL=1
++	LDFLAGS += -lmkl_rt
++else
++ifeq ($(BLAS),openblas)
++	LDFLAGS += -lopenblas -lm
++endif
++endif
++
++OBJECTS := $(patsubst %.c,%.o,$(LIB_SRC)) $(patsubst %.c,%.o,$(SCRAPPIE_SRC))
++
++%.o: %.c src/version.h
++	$(CC) -c -o $@ $(CFLAGS) $(CPPFLAGS) $<
++
++scrappie: $(OBJECTS)
++	$(CC) -o $@ $^ $(LDFLAGS)
++
++src/version.h:
++	echo '#define SCRAPPIE_VERSION "test"'>$@
+ 
+-.PHONY: test
+-test: ${buildDir}/scrappie
+-	cd ${buildDir} && \
+-	make test
+ 
+ .PHONY: clean
+ clean:
+-	rm -rf ${buildDir}
++	rm -f scrappie $(OBJECTS) src/version.h
+ 
+-${buildDir}/scrappie: ${buildDir}
+-	cd ${buildDir} && \
+-	cmake .. -DCMAKE_BUILD_TYPE=${releaseType} && \
+-	make
+-    
+diff --git a/src/layers.c b/src/layers.c
+index ebb40c1..b648a4d 100644
+--- a/src/layers.c
++++ b/src/layers.c
+@@ -1,5 +1,7 @@
+ #ifdef __APPLE__
+ #    include <Accelerate/Accelerate.h>
++#elif defined SCRAPPIE_MKL
++#    include <mkl.h>
+ #else
+ #    include <cblas.h>
+ #endif
+diff --git a/src/scrappie_matrix.c b/src/scrappie_matrix.c
+index 50a2521..b5f256d 100644
+--- a/src/scrappie_matrix.c
++++ b/src/scrappie_matrix.c
+@@ -1,5 +1,7 @@
+ #ifdef __APPLE__
+ #    include <Accelerate/Accelerate.h>
++#elif defined SCRAPPIE_MKL
++#    include <mkl.h>
+ #else
+ #    include <cblas.h>
+ #endif
+-- 
+2.17.0
+

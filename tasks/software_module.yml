@@ -30,6 +30,14 @@
     creates: "{{source_dir}}/{{name}}-{{version}}/{{unarchive_creates|default('LICENSE')}}"
   when: "url.endswith('.zip')"
 
+- name: Apply patches
+  patch:
+    src: "{{item}}"
+    basedir: "{{source_dir}}/{{name}}-{{version}}"
+    strip: 1
+  with_fileglob:
+    - "patches/{{inventory_hostname}}/{{name}}/*.patch"
+
 - name: Build and Install {{name}}
   shell: >
     export PREFIX="{{soft_dir }}/{{name}}-{{version}}/" &&

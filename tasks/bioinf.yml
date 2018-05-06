@@ -236,13 +236,35 @@
     required_modules:
       - cunit/2.1-3
       - hdf5/1.8.10p
-      - openblas/0.2.20
+      - intel-mkl
     unarchive_creates: CMakeLists.txt
     build_script: >
-      rm -rf build && mkdir build && cd build &&
-      cmake .. -DCMAKE_INSTALL_PREFIX=$PREFIX && make install
+      make BLAS=mkl && mkdir $PREFIX/bin && mv scrappie $PREFIX/bin
     build_creates: bin/scrappie
     module_def:
-      help_text: 'scappie: a ONT basecaller'
+      help_text: 'scrappie: a ONT basecaller'
       dev: false
+    clean_source: no
   tags: modules,scrappie
+
+############
+#  Kraken  #
+############
+- include: software_module.yml
+  vars:
+    name: kraken
+    version: "1.1"
+    url: "https://github.com/DerrickWood/kraken/archive/v{{version}}.tar.gz"
+    required_modules:
+      - zlib/1.2.8
+    unarchive_creates: install_kraken.sh
+    build_script: >
+      bash ./install_kraken.sh $PREFIX &&
+      curl http://www.cbcb.umd.edu/software/jellyfish/jellyfish-1.1.11.tar.gz | tar xvz &&
+      cd jellyfish-*/ && ./configure --prefix $PREFIX && make install && ln -s $PREFIX/bin/* $PREFIX/
+    build_creates: kraken
+    module_def:
+      help_text: 'Kraken taxon assignment'
+      dev: false
+      path_dir: ''
+  tags: modules,kraken
