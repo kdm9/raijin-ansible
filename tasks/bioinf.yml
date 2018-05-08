@@ -268,3 +268,25 @@
       dev: false
       path_dir: ''
   tags: modules,kraken
+
+###########
+#  Plink  #
+###########
+- include: software_module.yml
+  vars:
+    name: plink19
+    version: "180410"
+    url: "https://www.cog-genomics.org/static/bin/plink{{version}}/plink_src.zip"
+    required_modules:
+      - zlib/1.2.8
+      - atlas
+    unarchive_creates: Makefile
+    build_script: >
+      cd 1.9 &&
+      make -j4 CPPFLAGS="-DDYNAMIC_ZLIB=1" ZLIB=$ZLIB_ROOT/lib/libz.a BLASFLAGS=" -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_ilp64.a ${MKLROOT}/lib/intel64/libmkl_intel_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a -Wl,--end-group -liomp5 -lpthread -lm -ldl" &&
+      make install DESTDIR="" PREFIX=$PREFIX
+    build_creates: bin/plink
+    module_def:
+      help_text: 'plink1.9'
+      dev: false
+  tags: modules,plink
