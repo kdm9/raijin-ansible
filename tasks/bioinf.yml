@@ -290,3 +290,23 @@
       help_text: 'plink1.9'
       dev: false
   tags: modules,plink
+
+##########################
+#  vt (variant toolkit)  #
+##########################
+- include: software_module.yml
+  vars:
+    name: vt
+    version: master
+    gitrepo: https://github.com/atks/vt
+    required_modules: []
+    unarchive_creates: Makefile
+    build_script: >
+      module unload intel-cc intel-fc intel-mkl &&
+      make && mkdir $PREFIX/bin && mv vt $PREFIX/bin
+    build_creates: bin/vt
+    module_def:
+      help_text: 'variant toolkit'
+      dev: false
+  tags: modules,vt
+

@@ -8,10 +8,19 @@
     - "{{soft_dir}}/{{name}}-{{version}}"
     - "{{source_dir}}/{{name}}-{{version}}"
 
+- name: Clone {{name}}
+  git:
+    repo: "{{gitrepo}}"
+    update: yes
+    version: "{{version}}"
+    dest: "{{source_dir}}/{{name}}-{{version}}"
+  when: gitrepo is defined
+
 - name: Download {{name}}
   get_url:
     url: "{{url}}"
     dest: "{{source_dir}}/{{name}}-{{version}}/{{url|basename}}"
+  when: url is defined
 
 - name: Uncompress {{name}} -- tarball
   unarchive:
@@ -20,7 +29,7 @@
     extra_opts: "{{unarchive_extra_opts|default(['--strip-components=1'])}}"
     remote_src: yes
     creates: "{{source_dir}}/{{name}}-{{version}}/{{unarchive_creates|default('LICENSE')}}"
-  when: "'.tar' in url or url.endswith('tgz')"
+  when: "url is defined and '.tar' in url or url.endswith('tgz')"
 
 - name: Uncompress {{name}} -- zipfile
   unarchive:
@@ -28,7 +37,7 @@
     dest: "{{unarchive_dest|default('%s/%s-%s' % (source_dir, name, version))}}"
     remote_src: yes
     creates: "{{source_dir}}/{{name}}-{{version}}/{{unarchive_creates|default('LICENSE')}}"
-  when: "url.endswith('.zip')"
+  when: "url is defined and url.endswith('.zip')"
 
 - name: Apply patches
   patch:
