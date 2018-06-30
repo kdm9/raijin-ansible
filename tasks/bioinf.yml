@@ -164,14 +164,14 @@
 - include: software_module.yml
   vars:
     name: gatk4
-    version: "4.0.1.0"
+    version: "4.0.5.2"
     url: https://github.com/broadinstitute/gatk/releases/download/{{version}}/gatk-{{version}}.zip
     required_modules:
       - java/jdk1.8.0_60
     unarchive_creates: Makefile
     java_wrapper:
-      wrapper_name: "gatk"
-      jar: gatk-package-{{version}}-local.jar
+      wrapper_name: "gatk4"
+      jar: "{{soft_dir}}/{{name}}-{{version}}/gatk-package-{{version}}-local.jar"
     build_script: >
       cd gatk-4*/ &&
       mv gatk-package-{{version}}-local.jar  $PREFIX/
