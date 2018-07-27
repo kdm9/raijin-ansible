@@ -11,7 +11,9 @@
 - name: Clone {{name}}
   git:
     repo: "{{gitrepo}}"
+    recursive: yes
     update: yes
+    force: yes
     version: "{{version}}"
     dest: "{{source_dir}}/{{name}}-{{version}}"
   when: gitrepo is defined

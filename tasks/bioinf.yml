@@ -187,7 +187,7 @@
 - include: software_module.yml
   vars:
     name: seqhax
-    version: 0.6.2
+    version: 0.7.0
     url: https://github.com/kdmurray91/seqhax/archive/{{version}}.tar.gz
     required_modules:
       - zlib/1.2.8
@@ -310,3 +310,26 @@
       dev: false
   tags: modules,vt
 
+
+
+###############
+#  freebayes  #
+###############
+
+- include: software_module.yml
+  vars:
+    name: freebayes
+    version: v1.2.0
+    gitrepo: https://github.com/ekg/freebayes
+    required_modules: [htslib]
+    unarchive_creates: Makefile
+    build_script: >
+      cp vcflib/tabixpp/tabix.hpp ./src &&
+      make CC=${CC} CXX=${CXX} &&
+      mkdir $PREFIX/bin &&
+      mv bin/freebayes bin/bamleftalign $PREFIX/bin
+    build_creates: bin/freebayes
+    module_def:
+      help_text: 'freebayes'
+      dev: false
+  tags: modules,freebayes
