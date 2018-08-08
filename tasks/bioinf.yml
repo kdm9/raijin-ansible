@@ -333,3 +333,25 @@
       help_text: 'freebayes'
       dev: false
   tags: modules,freebayes
+
+
+##############
+#  Albacore  #
+##############
+- include: software_module.yml
+  vars:
+    name: albacore
+    version: "2.3.1"
+    required_modules:
+      - python3/3.6.2
+    build_script: >
+      python3 -m venv $PREFIX/env &&
+      source $PREFIX/env/bin/activate &&
+      pip3 install https://mirror.oxfordnanoportal.com/software/analysis/ont_albacore-{{version}}-cp36-cp36m-manylinux1_x86_64.whl &&
+      mkdir -p $PREFIX/bin &&
+      ln -s $PREFIX/env/bin/*.py $PREFIX/bin
+    build_creates: bin/read_fast5_basecaller.py
+    module_def:
+      help_text: 'Albacore ONT basecaller'
+      dev: false
+  tags: modules,albacore
