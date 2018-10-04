@@ -11,10 +11,10 @@
 - name: Clone {{name}}
   git:
     repo: "{{gitrepo}}"
-    recursive: yes
+    recursive: "{{git_recursive|default('yes')}}"
     update: yes
     force: yes
-    version: "{{version}}"
+    version: "{{versionprefix|default('')}}{{version}}"
     dest: "{{source_dir}}/{{name}}-{{version}}"
   when: gitrepo is defined
 
@@ -49,6 +49,12 @@
   with_fileglob:
     - "patches/{{inventory_hostname}}/{{name}}/*.patch"
 
+- name: Make $PREFIX/bin
+  file:
+    dest: "{{ soft_dir }}/{{name}}-{{version}}/bin/"
+    state: directory
+    mode: 0775
+
 - name: Build and Install {{name}}
   shell: >
     export PREFIX="{{soft_dir }}/{{name}}-{{version}}/" &&
@@ -68,7 +74,6 @@
   when: build_script is defined
 
 
-
 - name: Module definition for {{name}}
   template:
     src: "{{module_template}}"
@@ -83,12 +88,6 @@
     mode: 0664
     dest: "{{ modules_dir }}/{{name}}/.version"
 
-- name: Make dir for Java wrapper script for {{name}}
-  file:
-    dest: "{{ soft_dir }}/{{name}}-{{version}}/bin/"
-    state: directory
-    mode: 0775
-  when: java_wrapper is defined
 
 - name: Java wrapper script for {{name}}
   template:

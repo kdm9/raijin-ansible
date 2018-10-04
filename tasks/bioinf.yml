@@ -335,23 +335,26 @@
   tags: modules,freebayes
 
 
-##############
-#  Albacore  #
-##############
+############
+#  vcflib  #
+############
 - include: software_module.yml
   vars:
-    name: albacore
-    version: "2.3.1"
+    name: vcflib
+    version: master
+    git_recursive: false
+    gitrepo: https://github.com/vcflib/vcflib.git
     required_modules:
-      - python3/3.6.2
+      - zlib
+      - bzip2
+      - xz
+    unarchive_creates: Makefile
     build_script: >
-      python3 -m venv $PREFIX/env &&
-      source $PREFIX/env/bin/activate &&
-      pip3 install https://mirror.oxfordnanoportal.com/software/analysis/ont_albacore-{{version}}-cp36-cp36m-manylinux1_x86_64.whl &&
-      mkdir -p $PREFIX/bin &&
-      ln -s $PREFIX/env/bin/*.py $PREFIX/bin
-    build_creates: bin/read_fast5_basecaller.py
+      git submodule update --init --recursive &&
+      make openmp &&
+      mv bin/* $PREFIX/bin
+    build_creates: bin/vcfuniq
     module_def:
-      help_text: 'Albacore ONT basecaller'
+      help_text: 'vcflib utilities'
       dev: false
-  tags: modules,albacore
+  tags: modules,vcflib

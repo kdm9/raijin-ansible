@@ -1,0 +1,48 @@
+##############
+#  Albacore  #
+##############
+- include: software_module.yml
+  vars:
+    name: albacore
+    version: "2.3.1"
+    required_modules:
+      - python3/3.6.2
+    build_script: >
+      python3 -m venv $PREFIX/env &&
+      source $PREFIX/env/bin/activate &&
+      pip3 install https://mirror.oxfordnanoportal.com/software/analysis/ont_albacore-{{version}}-cp36-cp36m-manylinux1_x86_64.whl &&
+      mkdir -p $PREFIX/bin &&
+      ln -s $PREFIX/env/bin/*.py $PREFIX/bin
+    build_creates: bin/read_fast5_basecaller.py
+    module_def:
+      help_text: 'Albacore ONT basecaller'
+      dev: false
+  tags: modules,albacore
+
+
+################
+#  NanoPolish  #
+################
+- include: software_module.yml
+  vars:
+    name: nanopolish
+    version: "0.10.2"
+    versionprefix: "v"
+    required_modules:
+      - htslib/1.4
+      - eigen/3.2.8
+      - hdf5/1.8.14p
+    gitrepo: "https://github.com/jts/nanopolish.git"
+    git_recursive: no
+    build_script: >
+      git submodule update --init &&
+      sed -i -e 's/^include/#include/' Makefile &&
+      make HDF5=noinstall EIGEN=noinstall HTS=noinstall &&
+      mkdir -p $PREFIX/bin &&
+      mv nanopolish $PREFIX/bin
+    build_creates: bin/nanopolish
+    module_def:
+      help_text: 'Nanopolish ONT polisher'
+      dev: false
+  tags: modules,nanopolish
+
