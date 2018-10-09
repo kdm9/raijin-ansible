@@ -1,0 +1,28 @@
+##############
+#  ngstools  #
+##############
+- include: software_module.yml
+  vars:
+    name: ngstools
+    version: master
+    git_recursive: false
+    gitrepo: https://github.com/mfumagalli/ngsTools.git
+    required_modules:
+      - zlib
+      - bzip2
+      - xz
+      - gsl
+    unarchive_creates: Makefile
+    build_script: |
+      git submodule update --init --recursive &&
+      make CC=icc CXX=icpc &&
+      for prog in ngsSim ngsPopGen ngsUtils ngsDist ngsLD ngsF ngsF-HMM
+      do
+          cp $prog/$prog $PREFIX/bin
+      done
+    build_creates: bin/ngsDist
+    module_def:
+      help_text: 'ngsTools'
+      dev: false
+  tags: modules,ngstools
+
