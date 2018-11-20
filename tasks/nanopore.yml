@@ -46,3 +46,72 @@
       dev: false
   tags: modules,nanopolish
 
+
+################################
+#  scrappie minion basecaller  #
+################################
+- include: software_module.yml
+  vars:
+    name: scrappie
+    version: 1.3.2
+    url: https://github.com/nanoporetech/scrappie/archive/release-{{version}}.tar.gz
+    required_modules:
+      - cunit/2.1-3
+      - hdf5/1.8.10p
+      - intel-mkl
+    unarchive_creates: CMakeLists.txt
+    build_script: >
+      make BLAS=mkl && mkdir $PREFIX/bin && mv scrappie $PREFIX/bin
+    build_creates: bin/canu
+    module_def:
+      help_text: 'scrappie: a ONT basecaller'
+      dev: false
+    clean_source: no
+  tags: modules,scrappie
+
+
+##########
+#  Canu  #
+##########
+- include: software_module.yml
+  vars:
+    name: canu
+    version: "1.8"
+    url: https://github.com/marbl/canu/archive/v{{version}}.tar.gz
+    required_modules:
+      - perl/5.18.1
+    unarchive_creates: src/Makefile
+    build_script: >
+      rm -rf $PREFIX/bin &&
+      cd src && make -j 4 PREFIX=$PREFIX && mv $PREFIX/Linux-amd64/* $PREFIX/
+    build_creates: bin/canu
+    module_def:
+      help_text: "Canu long read assembler"
+      dev: false
+    clean_source: no
+  tags: modules,canu
+
+
+
+###########
+#  NGMLR  #
+###########
+- include: software_module.yml
+  vars:
+    name: ngmlr
+    version: 0.2.7
+    url: https://github.com/philres/ngmlr/archive/v{{version}}.tar.gz
+    required_modules:
+      - intel-mkl
+    unarchive_creates: src/Makefile
+    build_script: >
+      mkdir build && cd build &&
+      cmake -DSTATIC=ON .. -DCMAKE_INSTALL_PREFIX=$PREFIX &&
+      make -j 4 && make install
+    build_creates: bin/ngmlr
+    module_def:
+      help_text: 'NGMlr long read mapper'
+      dev: false
+    clean_source: no
+  tags: modules,ngmlr
+

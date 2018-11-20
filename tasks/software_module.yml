@@ -22,6 +22,7 @@
   get_url:
     url: "{{url}}"
     dest: "{{source_dir}}/{{name}}-{{version}}/{{url|basename}}"
+    validate_certs: "{{validate_certs|default('yes')}}"
   when: url is defined
 
 - name: Uncompress {{name}} -- tarball

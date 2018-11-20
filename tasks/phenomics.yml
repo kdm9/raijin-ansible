@@ -1,0 +1,90 @@
+
+############
+#  opencv  #
+############
+- include: software_module.yml
+  vars:
+    name: opencv
+    version: "3.4.3"
+    url: "https://github.com/opencv/opencv/archive/{{version}}.zip"
+    required_modules:
+      - zlib
+    build_script: >
+      module unload python &&
+      mkdir -p build && cd build &&
+      cmake -DCMAKE_INSTALL_PREFIX=$PREFIX &&
+      make  &&
+      make install
+    build_creates: bin/ffmpeg
+    module_def:
+      help_text: 'opencv'
+      dev: true
+  tags: modules,opencv,phenomics
+
+
+############
+#  FFMpeg  #
+############
+- include: software_module.yml
+  vars:
+    name: ffmpeg
+    version: "4.0.2"
+    url: "https://ffmpeg.org/releases/ffmpeg-{{version}}.tar.bz2"
+    required_modules:
+      - eigen
+      - yasm
+      - zlib
+      - openh264
+    build_script: >
+      ./configure --prefix=$PREFIX --enable-gpl --enable-nonfree --disable-doc --enable-libfontconfig --enable-libfreetype --enable-libopenh264 --enable-libxml2  --enable-opencl &&
+      make  &&
+      make install
+    build_creates: bin/ffmpeg
+    module_def:
+      help_text: 'FFMpeg'
+      dev: true
+  tags: modules,ffmpeg,phenomics
+
+
+############
+#  libraw  #
+############
+- include: software_module.yml
+  vars:
+    name: libraw
+    version: "0.19.0"
+    url: "https://www.libraw.org/data/LibRaw-{{version}}.tar.gz"
+    validate_certs: no # their cert is broken
+    required_modules:
+      - zlib
+    build_script: >
+      ./configure --prefix=$PREFIX  &&
+      make  &&
+      make install
+    build_creates: lib/libraw.a
+    module_def:
+      help_text: 'libraw'
+      dev: true
+  tags: modules,libraw,phenomics
+  
+
+
+##############
+#  openh264  #
+##############
+- include: software_module.yml
+  vars:
+    name: openh264
+    version: "1.8.0"
+    url: "https://github.com/cisco/openh264/archive/v{{version}}.tar.gz"
+    required_modules:
+      - zlib
+      - yasm
+    build_script: >
+      make PREFIX=$PREFIX ASM=yasm &&
+      make install PREFIX=$PREFIX
+    build_creates: lib/libopenh264.a
+    module_def:
+      help_text: 'openh264'
+      dev: true
+  tags: modules,phenomics,openh264

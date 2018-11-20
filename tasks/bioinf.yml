@@ -21,6 +21,7 @@
       dev: false
   tags: modules,adapterremoval
 
+
 #########
 #  Axe  #
 #########
@@ -202,6 +203,7 @@
       dev: false
   tags: modules,seqhax
 
+
 ##################
 #  fastq-screen  #
 ##################
@@ -225,27 +227,6 @@
       path_dir: ''
   tags: modules,fastq-screen
 
-################################
-#  scrappie minion basecaller  #
-################################
-- include: software_module.yml
-  vars:
-    name: scrappie
-    version: 1.3.2
-    url: https://github.com/nanoporetech/scrappie/archive/release-{{version}}.tar.gz
-    required_modules:
-      - cunit/2.1-3
-      - hdf5/1.8.10p
-      - intel-mkl
-    unarchive_creates: CMakeLists.txt
-    build_script: >
-      make BLAS=mkl && mkdir $PREFIX/bin && mv scrappie $PREFIX/bin
-    build_creates: bin/scrappie
-    module_def:
-      help_text: 'scrappie: a ONT basecaller'
-      dev: false
-    clean_source: no
-  tags: modules,scrappie
 
 ############
 #  Kraken  #
@@ -268,6 +249,7 @@
       dev: false
       path_dir: ''
   tags: modules,kraken
+
 
 ###########
 #  Plink  #
